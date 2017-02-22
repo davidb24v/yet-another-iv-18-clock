@@ -111,14 +111,14 @@ First, start with the digit grids:
 #define DIG9    (1UL << 8)
 
 // Now the segments
-#define SEGA    (1UL <  9)
-#define SEGB    (1UL < 10)
-#define SEGC    (1UL < 11)
-#define SEGD    (1UL < 12)
-#define SEGE    (1UL < 13)
-#define SEGF    (1UL < 14)
-#define SEGG    (1UL < 15)
-#define DP      (1UL < 16)
+#define SEGA    (1UL <<  9)
+#define SEGB    (1UL << 10)
+#define SEGC    (1UL << 11)
+#define SEGD    (1UL << 12)
+#define SEGE    (1UL << 13)
+#define SEGF    (1UL << 14)
+#define SEGG    (1UL << 15)
+#define DP      (1UL << 16)
 
 // Digits
 
