@@ -10,8 +10,7 @@ https://oshpark.com/shared_projects/K4IOvS0o
 
 */
 
-// Using digitalWriteFast from https://github.com/watterott/Arduino-Libs
-#include "digitalWriteFast.h"
+#include <SPI.h>
 
 #include "digits.h"
 
@@ -29,8 +28,6 @@ const uint32_t clockDigit[] = {
 
 // Interface to the MAX 6921
 #define LOAD_PIN 9
-#define CLOCK_PIN 8
-#define DATA_PIN 7
 
 // We'll store the bits we need to send in data
 uint32_t data = 0;
@@ -40,17 +37,13 @@ byte hh=9, mm=59, ss=32;
 uint32_t last = 0;
 
 void xfer(uint32_t d) {
-    uint32_t mask = 1UL << 16;
-    bool z;
-    digitalWriteFast(LOAD_PIN, LOW);
-    for (int i=16; i>=0; i--) {
-        z = d & mask;
-        digitalWriteFast(CLOCK_PIN, LOW);
-        digitalWriteFast(DATA_PIN, z);
-        digitalWriteFast(CLOCK_PIN, HIGH);
-        mask = mask >> 1;
-    }
-    digitalWriteFast(LOAD_PIN, HIGH);
+    digitalWrite(LOAD_PIN, LOW);
+    SPI.beginTransaction(SPISettings(5000000, MSBFIRST, SPI_MODE0));
+    SPI.transfer((uint8_t) (d >> 16) & 0xFF);
+    SPI.transfer((uint8_t) (d >> 8) & 0xFF);
+    SPI.transfer((uint8_t) d & 0xFF);
+    SPI.endTransaction();
+    digitalWrite(LOAD_PIN, HIGH);
 }
 
 void selectDigit(byte d) {
@@ -74,17 +67,14 @@ void finish(byte pos) {
 
 void setup() {
     // Set SPI SS pin as output 
-    pinModeFast(10, OUTPUT);
+    pinMode(10, OUTPUT);
 
     // Initialise the MAX 6921 LOAD pin and set it LOW
-    pinModeFast(LOAD_PIN, OUTPUT);
-    digitalWriteFast(LOAD_PIN, LOW);
-
-    pinModeFast(CLOCK_PIN, OUTPUT);
-    pinModeFast(DATA_PIN, OUTPUT);
+    pinMode(LOAD_PIN, OUTPUT);
+    digitalWrite(LOAD_PIN, LOW);
 
     Serial.begin(115200);
-
+    SPI.begin();
 }
 
 void loop() {
